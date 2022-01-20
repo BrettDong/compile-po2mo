@@ -13,7 +13,7 @@ You can either specify a concrete pair of input and output file paths:
 
 Or you can also give a pair of path patterns denoted by `<lang>`:
 
-`$ compile-po2mo ./i18n/translations/<lang>.po ./build/i18n/<lang>/LC_MESSAGES/app.mo`
+`$ compile-po2mo "./i18n/translations/<lang>.po" "./build/i18n/<lang>/LC_MESSAGES/app.mo"`
 
 In the latter case, all `.po` files matching the pattern will be compiled to the destination path:
 
@@ -22,6 +22,8 @@ In the latter case, all `.po` files matching the pattern will be compiled to the
 ./i18n/translations/es_ES.po => ./build/i18n/es_ES/LC_MESSAGES/app.mo
 ...
 ```
+
+On Windows, the path pattern has to be in backslash separator and do not contain current directory: `.\compile-po2mo.exe i18n\translations\<lang>.po build\i18n\<lang>\LC_MESSAGES\app.mo`. On UNIX shell, the path pattern has to be quoted.
 
 ## Limitation / Caveat
 

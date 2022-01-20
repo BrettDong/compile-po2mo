@@ -56,7 +56,11 @@ jobs:
         working-directory: Cataclysm-DDA
         shell: bash
         run: time lang/compile_mo.sh all
-      - name: Compile translations using compile-po2mo
+      - name: Compile translations using compile-po2mo (Windows)
+        if: runner.os == 'Windows'
         working-directory: Cataclysm-DDA
-        shell: bash
-        run: time ./compile-po2mo lang/po/<lang>.po lang/mo/<lang>/LC_MESSAGES/cataclysm-dda.mo
+        run: .\compile-po2mo.exe lang\po\<lang>.po lang\mo\<lang>\LC_MESSAGES\cataclysm-dda.mo
+      - name: Compile translations using compile-po2mo (UNIX)
+        if: runner.os != 'Windows'
+        working-directory: Cataclysm-DDA
+        run: time ./compile-po2mo "lang/po/<lang>.po" "lang/mo/<lang>/LC_MESSAGES/cataclysm-dda.mo"

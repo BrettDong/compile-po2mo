@@ -4,16 +4,22 @@ use std::env;
 use std::error::Error;
 use std::path::{Path, PathBuf};
 
+fn parent_directory(path: &Path) -> PathBuf {
+    let mut path = path.to_path_buf();
+    path.pop();
+    path
+}
+
 fn ensure_dir_exist(path: &Path) -> Result<(), std::io::Error> {
-    let mut directory = path.to_path_buf();
-    if directory.is_file() {
-        directory.pop();
+    if path.exists() && path.is_file() {
+        std::fs::create_dir_all(parent_directory(path))
+    } else {
+        std::fs::create_dir_all(path)
     }
-    std::fs::create_dir_all(directory)
 }
 
 fn compile(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
-    ensure_dir_exist(dst)?;
+    ensure_dir_exist(&parent_directory(dst))?;
     let catalog = po_file::parse(src)?;
     mo_file::write(&catalog, dst)?;
     Ok(())
@@ -40,6 +46,10 @@ fn main() {
     if input.contains("<lang>") && output.contains("<lang>") {
         if let Some((a, b)) = input.split_once("<lang>") {
             let pattern = format!("{}*{}", &a, &b);
+            println!(
+                "Ensure {:?}",
+                &PathBuf::from(output.split_once("<lang>").unwrap().0)
+            );
             if let Err(err) =
                 ensure_dir_exist(&PathBuf::from(output.split_once("<lang>").unwrap().0))
             {
