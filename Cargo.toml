@@ -1,0 +1,12 @@
+[package]
+name = "compile-po2mo"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Brett Dong <brett.browning.dong@gmail.com>" ]
+license = "MIT"
+repository = "https://github.com/brettdong/compile-po2mo"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+polib = { git = "https://github.com/BrettDong/polib", branch = "main" }
