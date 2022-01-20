@@ -10,15 +10,12 @@ jobs:
         include:
           - name: Ubuntu Linux 20.04 LTS
             os: ubuntu-20.04
-            artifact: ./target/release/compile-po2mo
-          
+
           - name: Windows Server 2022
             os: windows-2022
-            artifact: ./target/release/compile-po2mo.exe
-          
+
           - name: macOS 10.15
             os: macos-10.15
-            artifact: ./target/release/compile-po2mo
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -62,4 +59,4 @@ jobs:
       - name: Compile translations using compile-po2mo
         working-directory: Cataclysm-DDA
         shell: bash
-        run: time find lang/po -type f -name '*.po' -print0 | xargs -0 -n1 basename | grep -o '^[^\.]*' | xargs -n1 -I {} ./compile-po2mo lang/po/{}.po lang/mo/{}/LC_MESSAGES/cataclysm-dda.mo
+        run: time ./compile-po2mo lang/po/<lang>.po lang/mo/<lang>/LC_MESSAGES/cataclysm-dda.mo

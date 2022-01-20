@@ -7,7 +7,21 @@ A blazing fast CLI program to compile GNU gettext .po file to binary .mo format.
 
 ## Usage
 
+You can either specify a concrete pair of input and output file paths:
+
 `$ compile-po2mo input.po output.mo`
+
+Or you can also give a pair of path patterns denoted by `<lang>`:
+
+`$ compile-po2mo ./i18n/translations/<lang>.po ./build/i18n/<lang>/LC_MESSAGES/app.mo`
+
+In the latter case, all `.po` files matching the pattern will be compiled to the destination path:
+
+```
+./i18n/translations/ja.po => ./build/i18n/ja/LC_MESSAGES/app.mo
+./i18n/translations/es_ES.po => ./build/i18n/es_ES/LC_MESSAGES/app.mo
+...
+```
 
 ## Limitation / Caveat
 

@@ -33,14 +33,17 @@ jobs:
           - name: Ubuntu Linux 20.04 LTS
             os: ubuntu-20.04
             artifact: ./target/release/compile-po2mo
+            asset_name: linux
           
           - name: Windows Server 2022
             os: windows-2022
             artifact: ./target/release/compile-po2mo.exe
+            asset_name: windows
           
           - name: macOS 10.15
             os: macos-10.15
             artifact: ./target/release/compile-po2mo
+            asset_name: macos
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -56,6 +59,9 @@ jobs:
         with:
           command: build
           args: --release
+      - name: Strip debug symbols
+        if: runner.os != 'Windows'
+        run: strip ${{ matrix.artifact }}
       - name: Checksum (UNIX)
         if: runner.os != 'Windows'
         run: shasum -a 256 ${{ matrix.artifact }}
@@ -68,6 +74,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           asset_content_type: 'application/octet-stream'
-          asset_name: ${{ matrix.name }}
+          asset_name: ${{ matrix.asset_name }}
           asset_path: ${{ matrix.artifact }}         
           upload_url: ${{ needs.release.outputs.upload_url }}
