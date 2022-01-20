@@ -1,0 +1,65 @@
+name: "Benchmark"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    strategy:
+      matrix:
+        include:
+          - name: Ubuntu Linux 20.04 LTS
+            os: ubuntu-20.04
+            artifact: ./target/release/compile-po2mo
+          
+          - name: Windows Server 2022
+            os: windows-2022
+            artifact: ./target/release/compile-po2mo.exe
+          
+          - name: macOS 10.15
+            os: macos-10.15
+            artifact: ./target/release/compile-po2mo
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Pull benchmark repository (CleverRaven/Cataclysm-DDA)
+        run: |
+          git clone --depth 1 https://github.com/CleverRaven/Cataclysm-DDA
+          cd Cataclysm-DDA
+          git show -s
+      - name: Download compile-po2mo (Windows)
+        working-directory: Cataclysm-DDA
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/BrettDong/compile-po2mo/releases/latest/download/Windows.Server.2022" -outfile compile-po2mo.exe
+      - name: Download compile-po2mo (Linux)
+        working-directory: Cataclysm-DDA
+        if: runner.os == 'Linux'
+        run: |
+          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/Ubuntu.Linux.20.04.LTS -O compile-po2mo
+          chmod +x compile-po2mo
+      - name: Download compile-po2mo (macOS)
+        working-directory: Cataclysm-DDA
+        if: runner.os == 'macOS'
+        run: |
+          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/macOS.10.15 -O compile-po2mo
+          chmod +x compile-po2mo
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install gettext
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install gettext
+      - name: Compile translations using msgfmt
+        working-directory: Cataclysm-DDA
+        shell: bash
+        run: time lang/compile_mo.sh all
+      - name: Compile translations using compile-po2mo
+        working-directory: Cataclysm-DDA
+        shell: bash
+        run: time find lang/po -type f -name '*.po' -print0 | xargs -0 -n1 basename | grep -o '^[^\.]*' | xargs -n1 -I {} ./compile-po2mo lang/po/{}.po lang/mo/{}/LC_MESSAGES/cataclysm-dda.mo
