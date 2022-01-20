@@ -31,15 +31,23 @@ Just compiles a single `.po` file in UTF-8 encoding to a `.mo` file in UTF-8 enc
 
 ## Benchmark
 
-Detailed logs can be viewed at https://github.com/BrettDong/compile-po2mo/actions/runs/1723363718 .
+Detailed logs can be viewed at https://github.com/BrettDong/compile-po2mo/actions/runs/1724533629 .
 
 Time to compile [all translations to 35 languages](https://github.com/CleverRaven/Cataclysm-DDA/tree/372311faa019666a9015e7e8254a53bae98190e2/lang/po) on GitHub Actions runners:
 
-| GitHub Actions Host | Method | Time |
-|---|---|---|
-| Windows Server 2019 | `msgfmt` | 47.168s |
-| Windows Server 2019 | `compile-po2mo` | 6.328s |
-| Ubuntu Linux 20.04 | `msgfmt` | 35.642s |
-| Ubuntu Linux 20.04 | `compile-po2mo` | 4.132s |
-| macOS 10.15 | `msgfmt` | 25.736s |
-| macOS 10.15 | `compile-po2mo` | 5.990s |
+| GitHub Actions Host | Method | Parallelism | Time |
+|---|---|---|---|
+| Windows Server 2019 | `msgfmt` | sequential | 47.168s |
+| Windows Server 2019 | `msgfmt` | dual-core | ~30s *(1) |
+| Windows Server 2019 | `compile-po2mo` | sequential | 6.328s |
+| Windows Server 2019 | `compile-po2mo` | dual-core | 3.887s |
+| Ubuntu Linux 20.04 | `msgfmt` | sequential | 35.642s |
+| Ubuntu Linux 20.04 | `compile-po2mo` | sequential | 4.132s |
+| Ubuntu Linux 20.04 | `compile-po2mo` | dual-core | 2.183s |
+| macOS 10.15 | `msgfmt` | sequential | 25.736s |
+| macOS 10.15 | `compile-po2mo` | sequential | 5.990s |
+| macOS 10.15 | `compile-po2mo` | tri-core | 5.786s *(2) |
+
+1. empirical data from https://github.com/CleverRaven/Cataclysm-DDA/runs/4881530176 .
+
+2. it is weird that tri-core parallel compilation in macOS 10.15 virtual environment on GitHub Actions does not yield significant speedup.
