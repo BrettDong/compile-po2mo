@@ -12,4 +12,4 @@ dependencies = [
 [[package]]
 name = "polib"
 version = "0.0.1"
-source = "git+https://github.com/BrettDong/polib?branch=main#30b73927943f65b5ed7a16ed62d63164a86cbb6c"
+source = "git+https://github.com/BrettDong/polib?branch=main#9c8942a7b7197a467aa121991908cbd81903406b"
