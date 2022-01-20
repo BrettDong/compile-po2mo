@@ -29,18 +29,18 @@ jobs:
         working-directory: Cataclysm-DDA
         if: runner.os == 'Windows'
         run: |
-          Invoke-WebRequest -Uri "https://github.com/BrettDong/compile-po2mo/releases/latest/download/Windows.Server.2022" -outfile compile-po2mo.exe
+          Invoke-WebRequest -Uri "https://github.com/BrettDong/compile-po2mo/releases/latest/download/windows" -outfile compile-po2mo.exe
       - name: Download compile-po2mo (Linux)
         working-directory: Cataclysm-DDA
         if: runner.os == 'Linux'
         run: |
-          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/Ubuntu.Linux.20.04.LTS -O compile-po2mo
+          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/linux -O compile-po2mo
           chmod +x compile-po2mo
       - name: Download compile-po2mo (macOS)
         working-directory: Cataclysm-DDA
         if: runner.os == 'macOS'
         run: |
-          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/macOS.10.15 -O compile-po2mo
+          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/macos -O compile-po2mo
           chmod +x compile-po2mo
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
