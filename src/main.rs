@@ -30,8 +30,20 @@ struct Job {
     dst: PathBuf,
 }
 
+fn common_prefix(a: &str, b: &str) -> usize {
+    a.chars().zip(b.chars()).take_while(|(c, d)| c == d).count()
+}
+
+fn common_suffix(a: &str, b: &str) -> usize {
+    a.chars()
+        .rev()
+        .zip(b.chars().rev())
+        .take_while(|(c, d)| c == d)
+        .count()
+}
+
 fn main() {
-    let (input, output) = match (env::args().nth(1), env::args().nth(2)) {
+    let (mut input, mut output) = match (env::args().nth(1), env::args().nth(2)) {
         (Some(input), Some(output)) => (input, output),
         _ => {
             println!("Usage: compile-po2mo <input.po> <output.mo>");
@@ -44,37 +56,25 @@ fn main() {
     }
     let mut jobs = vec![];
     if input.contains("<lang>") && output.contains("<lang>") {
-        if let Some((a, b)) = input.split_once("<lang>") {
-            let pattern = format!("{}*{}", &a, &b);
-            println!(
-                "Ensure {:?}",
-                &PathBuf::from(output.split_once("<lang>").unwrap().0)
-            );
-            if let Err(err) =
-                ensure_dir_exist(&PathBuf::from(output.split_once("<lang>").unwrap().0))
-            {
-                println!("Cannot create target directory: {}", err);
-                std::process::exit(1);
+        if cfg!(windows) {
+            input = input.replace('/', "\\");
+            if input.starts_with(".\\") {
+                input = input.strip_prefix(".\\").unwrap().to_string();
             }
-            for entry in glob::glob(&pattern).unwrap() {
-                if let Ok(src) = entry {
-                    let mut lang = src.to_str().unwrap();
-                    lang = lang.strip_prefix(a).unwrap();
-                    lang = lang.strip_suffix(b).unwrap();
-                    let dst = PathBuf::from(output.replace("<lang>", lang));
-                    jobs.push(Job { src, dst });
-                } else if entry.is_err() {
-                    let err = entry.err().unwrap();
-                    println!(
-                        "Warning: {} in accessing {}",
-                        err.error(),
-                        err.path().display()
-                    );
-                }
+            output = output.replace('/', "\\");
+        }
+        for entry in glob::glob(&input.replace("<lang>", "*")).unwrap() {
+            if let Ok(src) = entry {
+                let src = src.to_str().unwrap();
+                let lang = &src[common_prefix(src, &input)..src.len() - common_suffix(src, &input)];
+                let dst = output.replace("<lang>", lang);
+                jobs.push(Job {
+                    src: PathBuf::from(src),
+                    dst: PathBuf::from(dst),
+                });
+            } else {
+                println!("Warning: {}", entry.err().unwrap());
             }
-        } else {
-            println!("Invalid po path glob pattern!");
-            std::process::exit(1);
         }
     } else if !input.contains("<lang>") && !output.contains("<lang>") {
         jobs.push(Job {
