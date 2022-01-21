@@ -12,3 +12,9 @@ repository = "https://github.com/brettdong/compile-po2mo"
 polib = "0.1.0"
 glob = "0.3.0"
 rayon = "1.5.1"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+panic = "abort"

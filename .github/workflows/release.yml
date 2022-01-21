@@ -32,17 +32,20 @@ jobs:
         include:
           - name: Ubuntu Linux 20.04 LTS
             os: ubuntu-20.04
-            artifact: ./target/release/compile-po2mo
+            triplet: x86_64-unknown-linux-gnu
+            artifact: compile-po2mo
             asset_name: linux
           
           - name: Windows Server 2022
             os: windows-2022
-            artifact: ./target/release/compile-po2mo.exe
+            triplet: x86_64-pc-windows-msvc
+            artifact: compile-po2mo.exe
             asset_name: windows
           
           - name: macOS 10.15
             os: macos-10.15
-            artifact: ./target/release/compile-po2mo
+            triplet: x86_64-apple-darwin
+            artifact: compile-po2mo
             asset_name: macos
 
     name: ${{ matrix.name }}
@@ -53,21 +56,17 @@ jobs:
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
+          override: true
+          components: rust-src
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-      - name: Strip debug symbols
-        if: runner.os != 'Windows'
-        run: strip ${{ matrix.artifact }}
+        run: cargo +nightly build -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort --target ${{ matrix.triplet }} --release
       - name: Checksum (UNIX)
         if: runner.os != 'Windows'
-        run: shasum -a 256 ${{ matrix.artifact }}
+        run: shasum -a 256 ./target/${{ matrix.triplet }}/release/${{ matrix.artifact }}
       - name: Checksum (Windows)
         if: runner.os == 'Windows'
-        run: Get-FileHash ${{ matrix.artifact }} -Algorithm SHA256 | Format-List
+        run: Get-FileHash ./target/${{ matrix.triplet }}/release/${{ matrix.artifact }} -Algorithm SHA256 | Format-List
       - name: Upload release
         uses: actions/upload-release-asset@v1
         env:
@@ -75,5 +74,5 @@ jobs:
         with:
           asset_content_type: 'application/octet-stream'
           asset_name: ${{ matrix.asset_name }}
-          asset_path: ${{ matrix.artifact }}         
+          asset_path: ./target/${{ matrix.triplet }}/release/${{ matrix.artifact }}         
           upload_url: ${{ needs.release.outputs.upload_url }}
