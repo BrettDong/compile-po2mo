@@ -3,19 +3,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub Actions](https://github.com/BrettDong/compile-po2mo/actions/workflows/release.yml/badge.svg)
 
-A blazing fast CLI program to compile GNU gettext .po file to binary .mo format.
+A blazing fast CLI program to compile GNU gettext `.po` file to binary `.mo` format.
 
 ## Usage
 
-You can either specify a concrete pair of input and output file paths:
+### Compile a single `.po` file to `.mo`
 
 `$ compile-po2mo input.po output.mo`
 
-Or you can also give a pair of path patterns denoted by `<lang>`:
+### Compile a batch of `.po` files in parallel
+
+Use path patterns denoted by `<lang>`:
 
 `$ compile-po2mo "./i18n/translations/<lang>.po" "./build/i18n/<lang>/LC_MESSAGES/app.mo"`
 
-In the latter case, all `.po` files matching the pattern will be compiled to the destination path:
+All `.po` files matching the pattern will be compiled to the destination path:
 
 ```
 ./i18n/translations/ja.po => ./build/i18n/ja/LC_MESSAGES/app.mo
@@ -23,11 +25,30 @@ In the latter case, all `.po` files matching the pattern will be compiled to the
 ...
 ```
 
-On Windows, the path pattern has to be in backslash separator and do not contain current directory: `.\compile-po2mo.exe i18n\translations\<lang>.po build\i18n\<lang>\LC_MESSAGES\app.mo`. On UNIX shell, the path pattern has to be quoted.
+Be noted that on UNIX shell the path pattern has to be quoted, otherwise `<` and `>` symbols are interpreted as redirection by the shell.
+
+### Use on GitHub Actions
+
+I have prepared an action to use this tool to compile translations in GNU gettext format as a step in your CI/CD workflow on GitHub Actions:
+
+```yml
+  - name: Compile translations
+    uses: BrettDong/compile-po2mo-action@v1
+    with:
+        input-path: 'lang/po/<lang>.po'
+        output-path: 'lang/mo/<lang>/LC_MESSAGES/app.mo'
+```
+
+
+Visit http://github.com/BrettDong/compile-po2mo-action for details.
 
 ## Limitation / Caveat
 
-Just compiles a single `.po` file in UTF-8 encoding to a `.mo` file in UTF-8 encoding and nothing else. No fancy features, no rigorous input sanity check, all for maximum performance. The program may panic or silently produce nonsense output when input data is ill-formed. You should only run this when all input data is trusted, and you want to cut down project build times and CI/CD costs.
+* Only supports UTF-8 encoding
+
+* Does not check input `.po` data on C format string correctness, duplicate entries, etc.
+
+The program may panic or silently produce nonsense output when input data is ill-formed. You should only use this tool when all input data is trusted and valid, and you want to cut down project build times and CI/CD costs.
 
 ## Benchmark
 
@@ -42,12 +63,15 @@ Time to compile [all translations to 35 languages](https://github.com/CleverRave
 | Windows Server 2019 | `compile-po2mo` | sequential | 6.328s |
 | Windows Server 2019 | `compile-po2mo` | dual-core | 3.887s |
 | Ubuntu Linux 20.04 | `msgfmt` | sequential | 35.642s |
+| Ubuntu Linux 20.04 | `msgfmt` | dual-core | ~17s *(2) |
 | Ubuntu Linux 20.04 | `compile-po2mo` | sequential | 4.132s |
 | Ubuntu Linux 20.04 | `compile-po2mo` | dual-core | 2.183s |
 | macOS 10.15 | `msgfmt` | sequential | 25.736s |
+| macOS 10.15 | `msgfmt` | tri-core | ~20s *(3) |
 | macOS 10.15 | `compile-po2mo` | sequential | 5.990s |
-| macOS 10.15 | `compile-po2mo` | tri-core | 5.786s *(2) |
+| macOS 10.15 | `compile-po2mo` | tri-core | 5.786s *(4) |
 
-1. empirical data from https://github.com/CleverRaven/Cataclysm-DDA/runs/4881530176 .
-
-2. it is weird that tri-core parallel compilation in macOS 10.15 virtual environment on GitHub Actions does not yield significant speedup.
+1. data from https://github.com/CleverRaven/Cataclysm-DDA/runs/4881530176 .
+2. data from https://github.com/BrettDong/Cataclysm-DDA/runs/4894867606 .
+3. data from https://github.com/BrettDong/Cataclysm-DDA/runs/4894867939 .
+4. it seems that task level parallelism does not speed up much on macOS GitHub Actions runners, and I don't know why.
