@@ -1,3 +1,4 @@
+use polib::po_file::po_file_parser::POParseOptions;
 use polib::{mo_file, po_file};
 use rayon::prelude::*;
 use std::env;
@@ -20,7 +21,11 @@ fn ensure_dir_exist(path: &Path) -> Result<(), std::io::Error> {
 
 fn compile(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
     ensure_dir_exist(&parent_directory(dst))?;
-    let catalog = po_file::parse(src)?;
+    let parse_options = POParseOptions {
+        message_body_only: true,
+        translated_only: true,
+    };
+    let catalog = po_file::parse(src, &parse_options)?;
     mo_file::write(&catalog, dst)?;
     Ok(())
 }

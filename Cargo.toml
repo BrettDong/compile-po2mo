@@ -9,7 +9,7 @@ repository = "https://github.com/brettdong/compile-po2mo"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-polib = "0.1.0"
+polib = { git = "https://github.com/BrettDong/polib", branch = "main" }
 glob = "0.3.0"
 rayon = "1.5.1"
 
