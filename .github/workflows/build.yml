@@ -10,8 +10,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Ubuntu Linux 20.04 LTS
-            os: ubuntu-20.04
+          - name: Ubuntu Linux 18.04 LTS
+            os: ubuntu-18.04
             triplet: x86_64-unknown-linux-gnu
             artifact: compile-po2mo
             asset_name: linux
