@@ -1,7 +1,7 @@
 # `compile-po2mo`
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub Actions](https://github.com/BrettDong/compile-po2mo/actions/workflows/release.yml/badge.svg)
+![GitHub Actions](https://github.com/BrettDong/compile-po2mo/actions/workflows/build.yml/badge.svg)
 
 A blazing fast CLI program to compile GNU gettext `.po` file to binary `.mo` format.
 
