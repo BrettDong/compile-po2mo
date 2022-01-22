@@ -11,8 +11,8 @@ jobs:
           - name: Ubuntu Linux 20.04 LTS
             os: ubuntu-20.04
 
-          - name: Windows Server 2022
-            os: windows-2022
+          - name: Windows Server 2019
+            os: windows-2019
 
           - name: macOS 10.15
             os: macos-10.15
@@ -25,23 +25,6 @@ jobs:
           git clone --depth 1 https://github.com/CleverRaven/Cataclysm-DDA
           cd Cataclysm-DDA
           git show -s
-      - name: Download compile-po2mo (Windows)
-        working-directory: Cataclysm-DDA
-        if: runner.os == 'Windows'
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/BrettDong/compile-po2mo/releases/latest/download/windows" -outfile compile-po2mo.exe
-      - name: Download compile-po2mo (Linux)
-        working-directory: Cataclysm-DDA
-        if: runner.os == 'Linux'
-        run: |
-          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/linux -O compile-po2mo
-          chmod +x compile-po2mo
-      - name: Download compile-po2mo (macOS)
-        working-directory: Cataclysm-DDA
-        if: runner.os == 'macOS'
-        run: |
-          wget https://github.com/BrettDong/compile-po2mo/releases/latest/download/macos -O compile-po2mo
-          chmod +x compile-po2mo
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -52,15 +35,24 @@ jobs:
         run: |
           brew update
           brew install gettext
-      - name: Compile translations using msgfmt
-        working-directory: Cataclysm-DDA
-        shell: bash
-        run: time lang/compile_mo.sh all
-      - name: Compile translations using compile-po2mo (Windows)
+      - name: Compile translations using msgfmt (Windows)
         if: runner.os == 'Windows'
         working-directory: Cataclysm-DDA
-        run: .\compile-po2mo.exe lang\po\<lang>.po lang\mo\<lang>\LC_MESSAGES\cataclysm-dda.mo
-      - name: Compile translations using compile-po2mo (UNIX)
-        if: runner.os != 'Windows'
+        shell: pwsh
+        run: |
+          & "C:\msys64\mingw64\bin\mingw32-make" -C lang -j2
+      - name: Compile translations using msgfmt (Linux)
+        if: runner.os == 'Linux'
         working-directory: Cataclysm-DDA
-        run: time ./compile-po2mo "lang/po/<lang>.po" "lang/mo/<lang>/LC_MESSAGES/cataclysm-dda.mo"
+        shell: bash
+        run: time make localization -j$((`nproc`+0))
+      - name: Compile translations using msgfmt (macOS)
+        if: runner.os == 'macOS'
+        working-directory: Cataclysm-DDA
+        shell: bash
+        run: time make localization -j$((`sysctl -n hw.logicalcpu`+0))
+      - name: Compile translations using compile-po2mo
+        uses: BrettDong/compile-po2mo-action@v1
+        with:
+          input-path: Cataclysm-DDA/lang/po/<lang>.po
+          output-path: Cataclysm-DDA/lang/mo/<lang>/LC_MESSAGES/cataclysm-dda.mo
