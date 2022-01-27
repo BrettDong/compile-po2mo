@@ -24,6 +24,7 @@ fn compile(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
     let parse_options = POParseOptions {
         message_body_only: true,
         translated_only: true,
+        hash_map: false,
     };
     let catalog = po_file::parse(src, &parse_options)?;
     mo_file::write(&catalog, dst)?;
