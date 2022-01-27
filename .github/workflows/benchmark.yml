@@ -1,6 +1,11 @@
 name: "Benchmark"
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/benchmark.yml'
   workflow_dispatch:
 
 jobs:
@@ -40,17 +45,17 @@ jobs:
         working-directory: Cataclysm-DDA
         shell: pwsh
         run: |
-          & "C:\msys64\mingw64\bin\mingw32-make" -C lang -j2
+          Measure-Command { & C:\msys64\mingw64\bin\mingw32-make.exe -C lang -j2 }
       - name: Compile translations using msgfmt (Linux)
         if: runner.os == 'Linux'
         working-directory: Cataclysm-DDA
         shell: bash
-        run: time make localization -j$((`nproc`+0))
+        run: time make -C lang -j$((`nproc`+0))
       - name: Compile translations using msgfmt (macOS)
         if: runner.os == 'macOS'
         working-directory: Cataclysm-DDA
         shell: bash
-        run: time make localization -j$((`sysctl -n hw.logicalcpu`+0))
+        run: time make -C lang -j$((`sysctl -n hw.logicalcpu`+0))
       - name: Compile translations using compile-po2mo
         uses: BrettDong/compile-po2mo-action@v1
         with:
