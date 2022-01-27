@@ -52,26 +52,15 @@ The program may panic or silently produce nonsense output when input data is ill
 
 ## Benchmark
 
-Detailed logs can be viewed at https://github.com/BrettDong/compile-po2mo/actions/runs/1724533629 .
+Detailed logs can be viewed at https://github.com/BrettDong/compile-po2mo/actions/runs/1757459199 .
 
-Time to compile [all translations to 35 languages](https://github.com/CleverRaven/Cataclysm-DDA/tree/372311faa019666a9015e7e8254a53bae98190e2/lang/po) on GitHub Actions runners:
+Time to compile [all translations to 36 languages](https://github.com/CleverRaven/Cataclysm-DDA/tree/761fb517639f30146b382cf629aa5b3b47733011/lang/po) on GitHub Actions runners:
 
 | GitHub Actions Host | Method | Parallelism | Time |
 |---|---|---|---|
-| Windows Server 2019 | `msgfmt` | sequential | 47.168s |
-| Windows Server 2019 | `msgfmt` | dual-core | ~30s *(1) |
-| Windows Server 2019 | `compile-po2mo` | sequential | 6.328s |
-| Windows Server 2019 | `compile-po2mo` | dual-core | 3.887s |
-| Ubuntu Linux 20.04 | `msgfmt` | sequential | 35.642s |
-| Ubuntu Linux 20.04 | `msgfmt` | dual-core | ~17s *(2) |
-| Ubuntu Linux 20.04 | `compile-po2mo` | sequential | 4.132s |
-| Ubuntu Linux 20.04 | `compile-po2mo` | dual-core | 2.183s |
-| macOS 10.15 | `msgfmt` | sequential | 25.736s |
-| macOS 10.15 | `msgfmt` | tri-core | ~20s *(3) |
-| macOS 10.15 | `compile-po2mo` | sequential | 5.990s |
-| macOS 10.15 | `compile-po2mo` | tri-core | 5.786s *(4) |
-
-1. data from https://github.com/CleverRaven/Cataclysm-DDA/runs/4881530176 .
-2. data from https://github.com/BrettDong/Cataclysm-DDA/runs/4894867606 .
-3. data from https://github.com/BrettDong/Cataclysm-DDA/runs/4894867939 .
-4. it seems that task level parallelism does not speed up much on macOS GitHub Actions runners, and I don't know why.
+| Windows Server 2019 | `msgfmt` | dual-core | 30.157s |
+| Windows Server 2019 | `compile-po2mo` | dual-core | 1.908s |
+| Ubuntu Linux 20.04 | `msgfmt` | dual-core | 16.950s |
+| Ubuntu Linux 20.04 | `compile-po2mo` | dual-core | 1.050s |
+| macOS 10.15 | `msgfmt` | tri-core | 11.270s |
+| macOS 10.15 | `compile-po2mo` | tri-core | 1.231s |
